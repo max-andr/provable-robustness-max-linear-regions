@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 import argparse
 import scipy.io
 import tensorflow as tf
@@ -29,10 +31,10 @@ class Model(robustml.model.Model):
         self._logits = self._model.net(input_expanded)[-1]
 
         # load the model
-        model_path = "models/mmr+at/2019-02-16 12:08:43 dataset=fmnist nn_type=cnn_lenet_small p_norm=inf lmbd=2.0 gamma_rb=0.15 gamma_db=0.15 stage1hpl=10 ae_frac=0.5 epoch=100.mat"
+        model_path = "models/mmr+at/2019-02-17 01:54:16 dataset=mnist nn_type=cnn_lenet_small p_norm=inf lmbd=0.5 gamma_rb=0.2 gamma_db=0.2 ae_frac=0.5 epoch=100.mat"
         load_model(sess, self._model, model_path)
 
-        self._dataset = robustml.dataset.FMNIST()
+        self._dataset = robustml.dataset.MNIST()
         self._threat_model = robustml.threat_model.Linf(epsilon=0.1)
 
     @property

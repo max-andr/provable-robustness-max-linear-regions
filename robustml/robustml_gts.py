@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 import argparse
 import scipy.io
 import tensorflow as tf
@@ -21,7 +23,7 @@ def load_model(sess, model, model_path):
 class Model(robustml.model.Model):
     def __init__(self, sess):
         self._sess = sess
-        height, width, n_col = 28, 28, 1
+        height, width, n_col = 32, 32, 3
         self._input = tf.placeholder(tf.float32, (height, width, n_col))  # assuming inputs in [0, 1]
         input_expanded = tf.expand_dims(self._input, axis=0)
         hps = argparse.Namespace(height=height, width=width, n_col=n_col)  # needed for models.LeNetSmall
@@ -29,11 +31,11 @@ class Model(robustml.model.Model):
         self._logits = self._model.net(input_expanded)[-1]
 
         # load the model
-        model_path = "models/mmr+at/2019-02-17 01:54:16 dataset=mnist nn_type=cnn_lenet_small p_norm=inf lmbd=0.5 gamma_rb=0.2 gamma_db=0.2 ae_frac=0.5 epoch=100.mat"
+        model_path = "models/mmr+at/2019-02-24 17:53:14 dataset=gts nn_type=cnn_lenet_small p_norm=2 lmbd=6.0 gamma_rb=0.3 gamma_db=0.3 ae_frac=0.5 lr=0.001 epoch=100.mat"
         load_model(sess, self._model, model_path)
 
-        self._dataset = robustml.dataset.MNIST()
-        self._threat_model = robustml.threat_model.Linf(epsilon=0.1)
+        self._dataset = robustml.dataset.GTS()
+        self._threat_model = robustml.threat_model.L2(epsilon=0.2)
 
     @property
     def dataset(self):
