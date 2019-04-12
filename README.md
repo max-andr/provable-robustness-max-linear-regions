@@ -105,8 +105,9 @@ So for testing purposes, we recommend to evaluate it on several points, e.g. wit
 
 More details are available by `python eval.py --helpfull`.
 
-Note, that `eval.py` does not yet include evaluation of the lower bounds with [A randomized gradient-free attack on relu networks. GCPR, 2018](https://arxiv.org/abs/1811.11493)
-which is currently in preparation.
+Note, that `eval.py` does not include evaluation of the lower bounds with 
+[A randomized gradient-free attack on relu networks. GCPR, 2018](https://arxiv.org/abs/1811.11493),
+which is available in a [separate repository](https://github.com/jonasrauber/linear-region-attack).
 
 
 
