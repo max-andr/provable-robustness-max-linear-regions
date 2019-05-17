@@ -67,61 +67,15 @@ def load_model(sess, hps):
     """
     Note: in order to correctly load a model, one has to perform some reshapes or preprocessing steps.
     """
-    # if this is a Kolter-Wong model
-    if hps.kw_model:
-        if 'dataset=fmnist_model=cnn_lenet_small_method=robust_eps=0.1_checkpoint.pth' not in hps.model_path:
-            param_file = torch.load(hps.model_path, 'cpu')['state_dict'][0]
-        else:
-            param_file = torch.load(hps.model_path, 'cpu')
-        weight_names, bias_names = [], []
-        for var_name in param_file.keys():  # ['1.weight', '1.bias', '3.weight', '3.bias']
-            saved_var_val = param_file[var_name].numpy()
-            if 'weight' in var_name:
-                weight_names.append(var_name)
-                if len(saved_var_val.shape) == 2:
-                    if 'fc' in hps.nn_type:
-                        pass
-                    elif hps.nn_type == 'cnn_lenet_small':
-                        # Note, this is hardcoded only for cnn_lenet_small
-                        if var_name == '5.weight':  # first FC layer
-                            n_units_out, n_units_in = saved_var_val.shape
-                            saved_var_val = saved_var_val.reshape(
-                                [n_units_out, 32, hps.height // 4, hps.width // 4])  # NCHW
-                            saved_var_val = saved_var_val.transpose([0, 2, 3, 1])  # NCHW -> NHWC
-                            saved_var_val = saved_var_val.reshape([n_units_out, n_units_in])
-                    else:
-                        raise ValueError('this model is not supported')
-                    saved_var_val = saved_var_val.T
-                else:  # if conv tensor
-                    saved_var_val = saved_var_val.transpose([2, 3, 1, 0])  # From out x in x h x w  ->  h x w x in x out
-            elif 'bias' in var_name:
-                bias_names.append(var_name)
-                if 'fc' in hps.nn_type:
-                    saved_var_val = np.expand_dims(saved_var_val, 0)
-            else:
-                raise ValueError('wrong variable found in the saved pytorch file')
-            param_file[var_name] = saved_var_val
-    # if this is an MMR model
+    param_file = scipy.io.loadmat(hps.model_path)
+    if hps.nn_type == 'fc1':
+        weight_names = ['U', 'W']
+        bias_names = ['bU', 'bW']
+    elif hps.nn_type == 'cnn_lenet_small':
+        weight_names = ['weights_conv1', 'weights_conv2', 'weights_fc1', 'weights_fc2']
+        bias_names = ['biases_conv1', 'biases_conv2', 'biases_fc1', 'biases_fc2']
     else:
-        param_file = scipy.io.loadmat(hps.model_path)
-        if hps.nn_type == 'fc1':
-            weight_names = ['U', 'W']
-            bias_names = ['bU', 'bW']
-        elif hps.nn_type == 'cnn_lenet_small':
-            weight_names = ['weights_conv1', 'weights_conv2', 'weights_fc1', 'weights_fc2']
-            bias_names = ['biases_conv1', 'biases_conv2', 'biases_fc1', 'biases_fc2']
-        else:
-            raise ValueError('wrong nn_type')
-
-    # If this is the official KW-cifar10 model, apply normalization for the 1st conv layer
-    if 'dataset=cifar10_model=cnn_lenet_small_method=robust_eps=0.007843_checkpoint' in hps.model_path:
-        # mean, std = np.array([[[0.485, 0.456, 0.406]]]), 0.225
-        mean, std = np.array([[[0.485, 0.456, 0.406]]]), 0.225
-        param_file['0.weight'] = param_file['0.weight'] / std
-        mean_flat = np.tile(mean, [4, 4, 1]).flatten()
-        for i in range(param_file['0.bias'].shape[0]):  # for every bias
-            conv1_flat = param_file['0.weight'][:, :, :, i].flatten()  # note: already divided by std
-            param_file['0.bias'][i] = param_file['0.bias'][i] - mean_flat @ conv1_flat
+        raise ValueError('wrong nn_type')
 
     for var_tf, var_name_mat in zip(model.W, weight_names):
         var_tf.load(param_file[var_name_mat], sess)
@@ -142,7 +96,6 @@ parser.add_argument('--nn_type', type=str, default='fc1', help='NN type: fc1, cn
 parser.add_argument('--pgd_n_iter', type=int, default=40, help='e.g. 40, 100, etc')
 parser.add_argument('--n_test_eval', type=int, default=10000, help='On how many examples to perform the evaluation.')
 parser.add_argument('--model_path', type=str, default='', help='path to the model .mat file')
-parser.add_argument('--kw_model', action='store_true')
 parser.add_argument('--p', type=str, default='inf', help='P-norm: 2 or inf')
 
 
