@@ -212,7 +212,7 @@ with tf.Session(graph=graph, config=config) as sess:
 
     log.add('KW done in {:.2f} sec'.format(lower_bounds_time))
 
-    model_name = hps.model_path.split('/')[-1].replace('.pth', '.mat')  # take only the model name without its full path
+    model_name = hps.model_path.split('/')[-1].replace('.mat', '__exported.mat')  # take only the model name without its full path
     mat_path = hps.export_folder + model_name
     export_weights(sess, model, mat_path)  # export the model to the same folder as MIP results will be
 
