@@ -5,6 +5,7 @@
 
 **University of Tübingen and Saarland University**
 
+**Update**: Now all the models and datasets are hosted on [Google Drive](https://drive.google.com/drive/folders/1f_Qf1abFXZw1GgWxttO9tgek6M7_lYiZ).
 
 ## Main idea
 We introduce the *Maximum Margin Regularizer* (MMR), which expands the linear regions of ReLU-networks 
@@ -53,7 +54,7 @@ We present our extensive experimental results in the following table:
 
 ![](images/main_table.png)
 
-You can find all the models presented in this table in the folder `models`. 
+You can find all the models presented in this table in the folder `models` (can be downloaded from [here](https://drive.google.com/drive/folders/1f_Qf1abFXZw1GgWxttO9tgek6M7_lYiZ)). 
 The subfolders correspond to the training scheme (plain, adversarial training, Kolter and Wong, 
 MMR, MMR with adversarial training): 
 `plain`, `at`, `kw`, `mmr`, `mmr+at`.  
@@ -64,7 +65,7 @@ means that the model was trained on MNIST, the architecture was `cnn_lenet_small
 the MMR was applied wrt the Linf-norm with λ=0.5, γ_B=γ_D=0.2, with 50% of adversarial examples in every batch, and for 100 epochs in total.
 
 The datasets used (MNIST, FMNIST, GTS, CIFAR-10) are provided also as .mat files in 
-the folder `datasets`.
+the folder `datasets` (can be downloaded from [here](https://drive.google.com/drive/folders/1f_Qf1abFXZw1GgWxttO9tgek6M7_lYiZ)).
 
 
 
